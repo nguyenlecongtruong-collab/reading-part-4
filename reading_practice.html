@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dinosaurs - Flyers Reading Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+        
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            background-color: #f8fafc; 
+            color: #334155;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+            border-bottom: 2px dashed #94a3b8;
+            color: transparent;
+            margin: 0 4px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .gap.active {
+            border-bottom: 3px solid #eab308;
+            background-color: #fef08a;
+            color: transparent;
+            border-radius: 4px;
+        }
+
+        .gap.filled {
+            border-bottom: 2px solid #22c55e;
+            color: #16a34a;
+        }
+
+        .option-btn {
+            transition: all 0.2s ease;
+            transform: translateY(0);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* Dành cho cuộn mượt mà trên panel phải */
+        .sticky-panel {
+            position: sticky;
+            top: 2rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex flex-col">
+
+    <header class="max-w-6xl mx-auto w-full mb-8 text-center">
+        <div class="inline-block bg-blue-600 text-white rounded-full px-6 py-2 font-bold text-lg mb-4 shadow-md">
+            Part 4: Choose the right words and write them on the lines.
+        </div>
+        <h1 class="text-4xl font-bold text-green-600">Dinosaurs</h1>
+    </header>
+
+    <main class="max-w-6xl mx-auto w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- CỘT TRÁI: Nội dung bài đọc -->
+        <div class="col-span-1 lg:col-span-7 bg-white rounded-2xl shadow-lg p-6 md:p-8 border-2 border-green-100">
+            <div class="flex justify-center mb-6">
+                <img src="image_7a7865.jpg" alt="A purple triceratops dinosaur" class="rounded-xl shadow-md max-w-full h-auto max-h-64 object-cover border-4 border-green-50" onerror="this.src='https://placehold.co/600x300/e2e8f0/64748b?text=Dinosaur+Image'">
+            </div>
+
+            <div class="text-lg leading-loose text-gray-700 bg-green-50/50 p-6 rounded-xl border border-green-100" id="story-container">
+                <p>
+                    <span class="font-bold text-green-700">Example:</span> Dinosaurs <span class="text-green-600 font-bold underline">lived</span> on our planet 65,000,000 years ago! 
+                    The first dinosaurs <span id="gap-1" class="gap">1</span> like big lizards. 
+                    Many of them had short tails, big heads <span id="gap-2" class="gap">2</span> walked on four legs. 
+                    Most dinosaurs were herbivores, which means that they only ate plants. 
+                    Some of these dinosaurs were very <span id="gap-3" class="gap">3</span> but other kinds of dinosaur were bigger and heavier and were carnivores, which means that they ate meat.
+                </p>
+                <p class="mt-4">
+                    Dinosaurs lived <span id="gap-4" class="gap">4</span> warm forests where there were lots and lots <span id="gap-5" class="gap">5</span> plants and water. 
+                    But about 60,000,000 years ago, some people say <span id="gap-6" class="gap">6</span> weather on Earth suddenly got colder and drier. 
+                    Many plants <span id="gap-7" class="gap">7</span> dinosaurs liked to eat stopped growing, which was a terrible problem for these animals, so soon dinosaurs disappeared too.
+                </p>
+                <p class="mt-4">
+                    Today, people sometimes <span id="gap-8" class="gap">8</span> dinosaur teeth in rocks or under the ground. 
+                    Dinosaurs are now extinct, but you can learn about <span id="gap-9" class="gap">9</span> in special science museums or when you watch scary dinosaur films <span id="gap-10" class="gap">10</span> TV.
+                </p>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: Khu vực câu hỏi tương tác -->
+        <div class="col-span-1 lg:col-span-5 sticky-panel">
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-blue-100" id="quiz-container">
+                
+                <!-- Tiến độ -->
+                <div class="mb-6 flex justify-between items-center text-sm font-bold text-gray-500">
+                    <span>Question <span id="current-q-num" class="text-blue-600 text-lg">1</span> / 10</span>
+                    <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <!-- Khu vực Câu hỏi -->
+                <div id="question-area">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">Choose the correct word for gap <span id="gap-indicator" class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded">1</span></h2>
+                    
+                    <div id="options-container" class="grid grid-cols-1 gap-4 mb-6">
+                        <!-- Các nút đáp án sẽ được chèn bằng JS -->
+                    </div>
+                </div>
+
+                <!-- Khu vực Phản hồi (Ẩn mặc định) -->
+                <div id="feedback-area" class="hidden rounded-xl p-5 mb-6 text-center animate-fade-in">
+                    <div id="feedback-icon" class="text-4xl mb-2"></div>
+                    <h3 id="feedback-title" class="text-xl font-bold mb-2"></h3>
+                    <p id="feedback-text" class="text-gray-700"></p>
+                </div>
+
+                <!-- Nút Next -->
+                <button id="next-btn" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-colors text-lg" onclick="nextQuestion()">
+                    Tiếp tục ➔
+                </button>
+
+            </div>
+            
+            <!-- Màn hình hoàn thành -->
+            <div id="completion-screen" class="hidden bg-white rounded-2xl shadow-lg p-8 text-center border-2 border-green-400">
+                <div class="text-6xl mb-4">🏆</div>
+                <h2 class="text-3xl font-bold text-green-600 mb-4">Excellent!</h2>
+                <p class="text-lg text-gray-600 mb-6">Bạn đã hoàn thành xuất sắc bài tập đọc hiểu về Khủng long.</p>
+                <button onclick="location.reload()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-colors">
+                    Làm lại bài
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Dữ liệu câu hỏi và giải thích
+        const questionsData = [
+            {
+                id: 1,
+                options: ["looks", "looked", "looking"],
+                answer: "looked",
+                explanation: "Đoạn văn đang kể về những con khủng long đầu tiên trong quá khứ ('The first dinosaurs...'), vì vậy ta phải dùng động từ ở thì Quá khứ đơn (Past Simple) là <b>looked</b>."
+            },
+            {
+                id: 2,
+                options: ["and", "because", "than"],
+                answer: "and",
+                explanation: "Câu này liệt kê các đặc điểm của khủng long: 'short tails' (đuôi ngắn), 'big heads' (đầu to) <b>và (and)</b> đi bằng 4 chân. Từ 'and' dùng để nối các ý tương đồng."
+            },
+            {
+                id: 3,
+                options: ["small", "smaller", "smallest"],
+                answer: "small",
+                explanation: "Cấu trúc 'Some... were very + Tính từ gốc' (Một số... rất nhỏ). Vế sau có 'bigger and heavier' (so sánh hơn) để tạo sự đối lập, nên vế trước chỉ cần tính từ dạng nguyên thể là <b>small</b>."
+            },
+            {
+                id: 4,
+                options: ["to", "in", "from"],
+                answer: "in",
+                explanation: "Để chỉ nơi chốn 'sống ở trong những khu rừng ấm áp', ta dùng giới từ <b>in</b> (live in forests)."
+            },
+            {
+                id: 5,
+                options: ["off", "out", "of"],
+                answer: "of",
+                explanation: "Cụm từ chỉ số lượng 'lots and lots <b>of</b>...' có nghĩa là rất rất nhiều (cây cối và nước)."
+            },
+            {
+                id: 6,
+                options: ["the", "one", "those"],
+                answer: "the",
+                explanation: "'Weather on Earth' (Thời tiết trên Trái Đất) là một danh từ xác định, duy nhất nên ta phải dùng mạo từ xác định <b>the</b>."
+            },
+            {
+                id: 7,
+                options: ["what", "that", "who"],
+                answer: "that",
+                explanation: "Đại từ quan hệ <b>that</b> thay thế cho danh từ chỉ vật phía trước là 'Many plants' (Nhiều loài cây mà khủng long thích ăn)."
+            },
+            {
+                id: 8,
+                options: ["finds", "found", "find"],
+                answer: "find",
+                explanation: "Câu bắt đầu bằng 'Today' (Ngày nay) và 'sometimes' (thỉnh thoảng) nên dùng thì Hiện tại đơn. Chủ ngữ 'people' (mọi người) là số nhiều, nên động từ giữ nguyên là <b>find</b>."
+            },
+            {
+                id: 9,
+                options: ["they", "their", "them"],
+                answer: "them",
+                explanation: "Đứng sau giới từ 'about' cần một tân ngữ. Khủng long (Dinosaurs) là số nhiều, nên đại từ tân ngữ thay thế cho nó là <b>them</b> (học về chúng)."
+            },
+            {
+                id: 10,
+                options: ["at", "by", "on"],
+                answer: "on",
+                explanation: "Khi nói xem cái gì đó trên Tivi, máy tính, đài phát thanh... ta luôn dùng giới từ <b>on</b> (on TV, on the radio, on the internet)."
+            }
+        ];
+
+        let currentIndex = 0;
+        let isQuestionAnswered = false;
+
+        // Các elements DOM
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackText = document.getElementById('feedback-text');
+        const nextBtn = document.getElementById('next-btn');
+        const currentQNum = document.getElementById('current-q-num');
+        const gapIndicator = document.getElementById('gap-indicator');
+        const progressBar = document.getElementById('progress-bar');
+        const questionArea = document.getElementById('question-area');
+        const quizContainer = document.getElementById('quiz-container');
+        const completionScreen = document.getElementById('completion-screen');
+
+        // Khởi tạo ứng dụng
+        function init() {
+            renderQuestion();
+        }
+
+        // Cập nhật trạng thái hiển thị của text bên trái
+        function updateStoryGaps() {
+            // Reset tất cả các gap
+            for (let i = 1; i <= 10; i++) {
+                const gapEl = document.getElementById(`gap-${i}`);
+                if (gapEl) {
+                    gapEl.classList.remove('active');
+                    // Nếu chưa được điền thì giữ màu trong suốt
+                    if (!gapEl.classList.contains('filled')) {
+                        gapEl.textContent = i;
+                        gapEl.style.color = "transparent";
+                    }
+                }
+            }
+            
+            // Highlight gap hiện tại
+            const currentGapId = `gap-${questionsData[currentIndex].id}`;
+            const activeGapEl = document.getElementById(currentGapId);
+            if (activeGapEl && !activeGapEl.classList.contains('filled')) {
+                activeGapEl.classList.add('active');
+                activeGapEl.textContent = "___";
+                activeGapEl.style.color = "#a16207"; // text-yellow-800
+                
+                // Cuộn text bên trái đến gap hiện tại nếu cần
+                activeGapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // Hiển thị câu hỏi hiện tại
+        function renderQuestion() {
+            const currentQ = questionsData[currentIndex];
+            isQuestionAnswered = false;
+
+            // Cập nhật UI bộ đếm
+            currentQNum.textContent = currentQ.id;
+            gapIndicator.textContent = currentQ.id;
+            progressBar.style.width = `${(currentQ.id / 10) * 100}%`;
+
+            // Reset khu vực hiển thị
+            optionsContainer.innerHTML = '';
+            feedbackArea.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            // Tạo các nút đáp án
+            currentQ.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 font-bold py-4 px-6 rounded-xl text-lg text-left transition-all';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            updateStoryGaps();
+        }
+
+        // Xử lý khi chọn đáp án
+        function checkAnswer(selectedOption, btnElement) {
+            if (isQuestionAnswered) return; // Nếu đã trả lời đúng câu này thì bỏ qua click
+
+            const currentQ = questionsData[currentIndex];
+            const isCorrect = selectedOption === currentQ.answer;
+
+            // Xóa hiệu ứng của các nút khác
+            const allBtns = optionsContainer.querySelectorAll('button');
+
+            if (isCorrect) {
+                // TRẢ LỜI ĐÚNG
+                isQuestionAnswered = true;
+                
+                // Style nút đúng
+                btnElement.className = 'w-full bg-green-100 border-2 border-green-500 text-green-700 font-bold py-4 px-6 rounded-xl text-lg text-left shadow-sm';
+                
+                // Disable tất cả các nút
+                allBtns.forEach(b => {
+                    b.disabled = true;
+                    if(b !== btnElement) b.classList.add('opacity-50');
+                });
+
+                // Hiển thị Feedback
+                feedbackArea.className = 'mt-6 rounded-xl p-5 text-left border-2 border-green-200 bg-green-50 animate-fade-in';
+                feedbackIcon.innerHTML = '🎉';
+                feedbackTitle.className = 'text-xl font-bold mb-2 text-green-700';
+                feedbackTitle.textContent = 'Chính xác!';
+                feedbackText.innerHTML = currentQ.explanation;
+                
+                // Cập nhật text bài đọc bên trái
+                const gapEl = document.getElementById(`gap-${currentQ.id}`);
+                gapEl.textContent = currentQ.answer;
+                gapEl.className = 'gap filled font-bold text-green-600 underline';
+                gapEl.style.color = ''; // Bỏ transparent
+
+                // Hiển thị nút Next
+                nextBtn.classList.remove('hidden');
+                
+                // Cuộn panel bên phải xuống dưới để thấy nút Next
+                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+            } else {
+                // TRẢ LỜI SAI
+                // Áp dụng animation rung lắc và màu đỏ
+                btnElement.classList.remove('border-gray-200', 'bg-gray-50', 'hover:border-blue-400', 'hover:bg-blue-50');
+                btnElement.classList.add('border-red-400', 'bg-red-50', 'text-red-700', 'shake');
+                
+                // Hiển thị thông báo thử lại
+                feedbackArea.className = 'mt-6 rounded-xl p-4 text-center border-2 border-red-200 bg-red-50';
+                feedbackIcon.innerHTML = '🤔';
+                feedbackTitle.className = 'text-lg font-bold text-red-700 mb-1';
+                feedbackTitle.textContent = 'Chưa đúng mất rồi!';
+                feedbackText.innerHTML = 'Em hãy suy nghĩ lại và chọn một đáp án khác nhé.';
+
+                // Reset animation sau khi chạy xong để có thể click sai lần nữa
+                setTimeout(() => {
+                    btnElement.classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        // Chuyển sang câu tiếp theo
+        function nextQuestion() {
+            if (currentIndex < questionsData.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                // Hoàn thành bài tập
+                quizContainer.classList.add('hidden');
+                completionScreen.classList.remove('hidden');
+            }
+        }
+
+        // Chạy khi trang web đã load xong
+        window.onload = init;
+    </script>
+</body>
+</html>
